@@ -1,0 +1,29 @@
+﻿
+<input type="text" @bind-value="@name" />
+<input type="text" @bind-value="@lastname" />
+<input type="text" @bind-value="@country" />
+<input type="button" value="haga click" @onclick="ChangeText" />
+<div>
+    @information
+</div>
+
+
+@code{
+    [Parameter]
+    public string Message {get;set;}
+    string name = "";
+    string lastname = "";
+    string country = "";
+    string information = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        information = Message;
+    }
+
+    private void ChangeText()
+    {
+        information = name + "\n" + lastname + "\n" + country;
+
+    }
+}

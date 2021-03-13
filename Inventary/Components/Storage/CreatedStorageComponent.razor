@@ -1,0 +1,68 @@
+﻿@using Entities
+@using Bussines.Bussines_Store
+@using Bussines.Bussines_Product
+@using Bussines.Bussines_Warehouse
+
+<EditForm Model="@oStorage">
+    <div>
+        <label>Bodega:</label>
+        <InputSelect @bind-Value="oStorage.WarehouseId" class="form-control">
+            <option value="">Seleccione una bodega ..</option>
+            @foreach (var warehouse in warehouses)
+            {
+                <option value="@warehouse.WarehouseId">@warehouse.WarehouseName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div>
+        <label>Producto:</label>
+        <InputSelect @bind-Value="oStorage.ProductId" class="form-control">
+            <option value="">Seleccione un producto ..</option>
+            @foreach (var product in products)
+            {
+                <option value="@product.ProductId">@product.ProductName</option>
+            }
+        </InputSelect>
+    </div>
+    <input type="button" value="Almacebar Producto" @onclick="SaveStorage">
+</EditForm>
+<div class="text-center h4">
+    @message
+</div>
+
+@code {
+    StorageEntity oStorage = new StorageEntity();
+    List<WarehouseEntity> warehouses = new List<WarehouseEntity>();
+    List<ProductEntity> products = new List<ProductEntity>();
+    string message;
+    ReadProduct ReadProduct = new ReadProduct();
+    ReadWarehouse ReadWarehouse = new ReadWarehouse();
+    FindProductInStore FindProduct = new FindProductInStore();
+    CreateStore CreateStore = new CreateStore();
+
+    protected override async Task OnInitializedAsync()
+    {
+        warehouses = ReadWarehouse.ItemList();
+        products = ReadProduct.ItemList();
+    }
+
+    private void SaveStorage()
+    {
+        oStorage.StorageId = $"{oStorage.Warehouse}-{oStorage.ProductId}";
+
+        if (!FindProductInStore.isProductInWarehouse(oStorage.StorageId))
+        {
+            oStorage.LastUpdate = DateTime.Now;
+            CreateStore.CreateItem(oStorage);
+            message = "Producto registrado";
+
+        }
+        else
+        {
+            message = "El producto ya existe en la bodega";
+        }
+
+
+    }
+}
